@@ -1,0 +1,140 @@
+<html >
+<head>
+    <meta charset="Cp1251" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Home</title>
+    <link href="bootstrap.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="jquery-2.1.1.js"></script>
+    <script type="text/javascript" src="bootstrap.js"></script>
+    <script type="text/javascript" src="script.js"></script>
+	<script type="text/javascript">starting();</script>
+</head>
+<body>
+     <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <strong style="color : white">GetInTouch</strong>
+            </div>
+            <div class="navbar-collapse collapse navbar-responsive-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Theme<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">default</a></li>
+                            <li><a href="#">cerulean</a></li>
+                            <li><a href="#">cyborg</a></li>
+                        </ul>
+                    </li>
+		
+                </ul>
+                <div class="forLog" id="forLog">
+						<div class="form-inline nav nav-pills pull-right" style="margin-top: 10px">
+
+				  		<input type="text" class="input-medium search-query" placeholder="NickName" id="NickName">
+				  		<input type="password" class="input-medium search-query" placeholder="Password" >
+				 		 <label class="checkbox">
+				    			<input type="checkbox"> Remember me
+				  		</label>
+						 <button  class="btn btn-primary" onclick="login();">Login</button>
+						 <button  class="btn btn-primary">Register</button>
+				      </div>
+                </div>  
+                
+            </div>
+        </div>
+    </div>
+    <input id="kol" type="hidden" value="0"/> 
+    <input id="nick" type="hidden" value="Mary"/> 
+    <div class="container jumbotron" style="margin-top: 40px">
+        <div class="row">
+	<div class="col-md-2">
+                 <img src="http://vladsokolovsky.com/forums/uploads/profile/photo-36.jpg?_r=0" alt="bootstrap Chat box user image" class="img-circle" />
+            </div>
+            <div class="col-md-4" id="forName">
+                
+            </div>
+        </div>
+        <br>
+        <br>
+         <button type="button" class="btn btn-primary btn-success" id="state" onclick="changeState(false);">Server is available</button>
+        <br>
+        <div class="row">
+        <div class=" col-lg-6 col-md-6 col-sm-6">
+                <div class="chat-box-div" style="height:500px">
+                    <div class="chat-box-head">
+                        GROUP CHAT HISTORY
+                            <button type="button" class="btn btn-info dropdown-toggle pull-right" data-toggle="dropdown" aria-expanded="false"/>
+                    </div>
+                    <div class="panel-body chat-box-main" id="myChat" offsetHeight = "500px">
+                    	
+                    </div>
+                    <div class="chat-box-footer">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Enter Text Here..." id="message">
+                            <span class="input-group-btn">
+                                <button onclick="sendClick();" class="btn btn-info" id="send">SEND</button>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-lg-3 col-md-3 col-sm-3">
+                <div class="chat-box-online-div">
+                    <div class="chat-box-online-head">
+                        ONLINE USERS (120)
+                    </div>
+                    <div class="panel-body chat-box-online">
+                        <hr class="hr-clas-low" />
+                        <div class="chat-box-online-left">
+                        <button class="btn">
+                            <img src="http://vladsokolovsky.com/forums/uploads/profile/photo-36.jpg?_r=0" alt="bootstrap Chat box user image" class="img-circle" />
+                            -  Justine Goliyad
+                            <br />
+                            </button>
+                        </div>
+                        <hr class="hr-clas-low" />
+
+                        <div class="chat-box-online-right">
+                        <button class="btn">
+                            <img src="http://vladsokolovsky.com/forums/uploads/profile/photo-36.jpg?_r=0" alt="bootstrap Chat box user image" class="img-circle" />
+                            -  Romin Royeelin
+                            <br />
+                            </button>
+                        </div>
+                        <hr class="hr-clas-low" />
+                        <div class="chat-box-online-left">
+                        <button class="btn">
+                            <img src="http://vladsokolovsky.com/forums/uploads/profile/photo-36.jpg?_r=0" alt="bootstrap Chat box user image" class="img-circle" />
+                            -  Justine Goliyad
+                            <br />
+                            </button>
+                        </div>
+                        <hr class="hr-clas-low" />
+
+                        <div class="chat-box-online-right">
+                        <button class="btn">
+                            <img src="http://vladsokolovsky.com/forums/uploads/profile/photo-36.jpg?_r=0" alt="bootstrap Chat box user image" class="img-circle" />
+                            -  Romin Royeelin
+                            <br />
+                            </button>
+                        </div>
+                        <hr class="hr-clas-low" />
+                    </div>
+
+                </div>
+
+            </div>
+            
+        </div>
+    </div>
+    
+</body>
+
+</html>
