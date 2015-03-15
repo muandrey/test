@@ -28,8 +28,6 @@ function changeState(st)
 	    image.alt = "bootstrap Chat box user image";
 	    image.className = "img-circle";
 	    bDiv.appendChild(image);
-	    //bDiv.innerHTML += new Date().toLocaleString();
-		//bDiv.innerHTML += new Date();
 		bDiv.innerHTML += date;
 	    bDiv.innerHTML += "- ";
 	    bDiv.innerHTML += nickname;
@@ -53,25 +51,41 @@ function changeState(st)
 		{
 			sendClick();
 		}
-	}
+	};
+	
 	function getMessages()
 	{
 		$.ajax({
                         method: 'GET',
                         url:"?token=TN"+(((+document.getElementById('kol').value)*8)+11)+"EN",
-						success:fillWithMessages
+						success:fillWithMessages,
+						error:function(){changeState(false);}
+						
         });
-	}
-	function fillWithMessages(messages)
+	};
+	function fillWithMessages(messagesJ)
 	{
-		messages=JSON.parse(messages);
-		document.getElementById('kol').value=(+document.getElementById('kol').value+(+messages.token));
-		messages=messages.messages;
-		$.each(messages, function(key,value){
-			createMessage(value.Text, value.messageID, value.NickName,value.addedDate);
-			(document.getElementById('kol').value = document.getElementById('kol').value) + 1;
-		});
-	}
+		changeState(true);
+		messagesJ=JSON.parse(messagesJ);
+		messages=messagesJ.messages;
+		$.each(messages,setMessage);
+	};
+	function setMessage(key,value){
+			if(value.Text!="")
+			{
+				if(document.getElementById(value.messageID)==null)
+				{
+					createMessage(value.Text, value.messageID, value.NickName,value.addedDate);
+					document.getElementById('kol').value = value.messageID;
+				}
+				else
+				{
+					saveEdited(value.messageID,value.Text);
+				}
+			}
+			else
+				deleteMessageDO(value.messageID);			
+		}
 	function sendClick() {
 		$.ajax({
                         method: 'POST',
@@ -80,12 +94,22 @@ function changeState(st)
 												addedDate: new Date().toLocaleString()})
         });
 		document.getElementById('message').value="";
+		setTimeout(function(){ getMessages();},100);
     };
     function deleteMessage(id)
     {
-    	var b = document.getElementById('myChat');
-    	(element = document.getElementById(id)).parentNode.removeChild(element);
+    	$.ajax({method:'DELETE',
+				url:"?id="+id
+		});
+		setTimeout(function(){ getMessages();},100);
     };
+	function deleteMessageDO(id)
+	{
+		var b = document.getElementById('myChat');
+		element = document.getElementById(id)
+		element && element.parentNode.removeChild(element);
+	}
+	
     function editMessage(id)
     {
     	var elem = document.getElementById(id.slice(1));
@@ -112,13 +136,30 @@ function changeState(st)
     	inpGr.appendChild(but);
     	elem.getElementsByClassName("chat-box-left")[0].appendChild(inpGr);
     };
+	function saveEdited(id,text)
+    {
+        var elem = document.getElementById(id);
+		var elemt = elem.getElementsByClassName("chat-box-left")[0];
+		elem.getElementsByClassName("chat-box-left")[0].innerHTML = text;
+		addButtons(elemt, id);
+    }
     function save(id)
     {
-    	var elem = document.getElementById(id.slice(1));
+		id=id.slice(1);
+		var elem = document.getElementById(id);
     	var elemt = elem.getElementsByClassName("chat-box-left")[0];
     	var msg = elemt.getElementsByClassName("form-control")[0].value;
     	elem.getElementsByClassName("chat-box-left")[0].innerHTML = msg;
-    	addButtons(elemt, id.slice(1));
+    	addButtons(elemt, id);
+		$.ajax({
+                        method: 'PUT',
+                        data: JSON.stringify({ Text: msg,
+												NickName: document.getElementById('nick').value,
+												addedDate: new Date().toLocaleString(),
+												messageID: id})
+        });
+		setTimeout(function(){ getMessages();},100);
+
     };
     function addButtons(prev, id)
     {

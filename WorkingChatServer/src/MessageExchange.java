@@ -43,7 +43,10 @@ public class MessageExchange {
     public JSONObject getJSONObject(String json) throws ParseException {
         return (JSONObject) jsonParser.parse(json);
     }
-
+    public Message getEditedMessage(InputStream is) throws ParseException
+	{
+    	return Message.getEditedMessage(getJSONObject(inputStreamToString(is)));
+	}
     public String inputStreamToString(InputStream in) {
     	StringBuilder sb = new StringBuilder();
     	try

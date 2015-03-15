@@ -41,8 +41,8 @@ public class Server implements HttpHandler {
                 HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
                 System.out.println("Server started.");
                 String serverHost = InetAddress.getLocalHost().getHostAddress();
-                System.out.println("Get list of messages: GET http://" + serverHost + ":" + port + "/chat?token={token}");
-                System.out.println("Send message: POST http://" + serverHost + ":" + port + "/chat provide body json in format {\"message\" : \"{message}\"} ");
+                System.out.println("Get list of messages: GET http://" + serverHost + ":" + port + "?token={token}");
+                System.out.println("Send message: POST http://" + serverHost + ":" + port + " provide body json in format {\"message\" : \"{message}\"} ");
 
                 server.createContext("/", new Server());
                 server.setExecutor(null);
@@ -60,6 +60,10 @@ public class Server implements HttpHandler {
             response = doGet(httpExchange);
         } else if ("POST".equals(httpExchange.getRequestMethod())) {
             doPost(httpExchange);
+        } else if ("DELETE".equals(httpExchange.getRequestMethod())) {
+            doDelete(httpExchange);
+        } else if ("PUT".equals(httpExchange.getRequestMethod())) {
+            doPut(httpExchange);
         } else {
             response = "Unsupported http method: " + httpExchange.getRequestMethod();
         }
@@ -73,14 +77,28 @@ public class Server implements HttpHandler {
     	if(str.indexOf(".js")>=0)  return "text/javascript";
     	return "text/plain";
     }
+    private List<Message> getRightSLafterID(int index)
+    {
+    	if(index==0)
+    		return history;
+    	int i=0;
+    	for(;i<history.size() && history.get(i).messageID!=index;i++)
+    	{}
+    	if(i<history.size() && history.get(i).Text=="")
+    		return history.subList(i, history.size());
+    	return history.subList(i+1, history.size());
+    }
+    
+    
     private String doGet(HttpExchange httpExchange) {
         String query = httpExchange.getRequestURI().getQuery();
         if (query != null) {
             Map<String, String> map = queryToMap(query);
             String token = map.get("token");
+            System.out.println("Get request:token "+token+" recieved");
             if (token != null && !"".equals(token)) {
                 int index = messageExchange.getIndex(token);
-                return messageExchange.getServerResponse(history.subList(index, history.size()));
+                return messageExchange.getServerResponse(getRightSLafterID(index));
             } else {
                 return "Token query parameter is absent in url: " + query;
             }
@@ -89,6 +107,7 @@ public class Server implements HttpHandler {
         String path=httpExchange.getRequestURI().getPath();
         if(path!=null && !path.equals("/"))
         {
+        	System.out.println("Get request:path "+path+" recieved");
         	try {
         		byte arr[]= new byte[64*1024];
         		path="./chat"+path;
@@ -111,6 +130,7 @@ public class Server implements HttpHandler {
             return  resp.toString();
         }
     	try {
+    		System.out.println("Get request recieved");
     		byte arr[]= new byte[64*1024];
 			FileInputStream fi=new FileInputStream("chat/homepage.html");
 			while(true)
@@ -125,17 +145,49 @@ public class Server implements HttpHandler {
 		}
         return  resp.toString();
     }
-
-    private void doPost(HttpExchange httpExchange) {
-        try {
-            Message message = messageExchange.getClientMessage(httpExchange.getRequestBody());
-            System.out.println("Get Message from User "+message.NickName+" : " + message.Text);
+    private void doPut(HttpExchange httpExchange)
+    {
+    	try {
+            Message message = messageExchange.getEditedMessage(httpExchange.getRequestBody());
+            System.out.println("Put Message from User "+message.NickName+" : " + message.Text);
             history.add(message);
         } catch (ParseException e) {
             System.err.println("Invalid user message: " + httpExchange.getRequestBody() + " " + e.getMessage());
         }
     }
-
+    private void doPost(HttpExchange httpExchange) {
+        try {
+            Message message = messageExchange.getClientMessage(httpExchange.getRequestBody());
+            System.out.println("Post Message from User "+message.NickName+" : " + message.Text);
+            history.add(message);
+        } catch (ParseException e) {
+            System.err.println("Invalid user message: " + httpExchange.getRequestBody() + " " + e.getMessage());
+        }
+    }
+    private void doDelete(HttpExchange httpExchange)
+    {
+    	String query= httpExchange.getRequestURI().getQuery();
+    	if (query != null) {
+            Map<String, String> map = queryToMap(query);
+            String id = map.get("id");
+            System.out.println("DELETE request:id= "+id+" recieved");
+            if (id != null && !"".equals(id)) {
+                int index =Integer.parseInt(id);
+                delFromHist(index);
+            }
+        }
+    }
+    private void delFromHist(int id)
+    {
+    	int i=0;
+    	for(;history.get(i).messageID!=id;i++)
+    	{}
+    	if(i<history.size())
+    	{
+    		history.remove(i);
+    		history.add(new Message(id));
+    	}
+    }
     private void sendResponse(HttpExchange httpExchange, String response) throws IOException {
         httpExchange.sendResponseHeaders(200, response.getBytes("UTF-8").length);
         OutputStream os = httpExchange.getResponseBody();
